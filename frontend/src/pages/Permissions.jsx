@@ -277,7 +277,8 @@ function DoctorSearch({ selected, onSelect, onBlock, onConfirm }) {
     timer.current = setTimeout(async () => {
       setBusy(true);
       try {
-        const { data } = await api.get(`/doctors/search?q=${encodeURIComponent(val.trim())}`);
+        const normalized = val.trim().replace(/^(doctor|dr\.?)\s*/i, "").trim();
+        const { data } = await api.get(`/doctors/search?q=${encodeURIComponent(normalized || val.trim())}`);
         setResults(data.data || []);
         setOpen(true);
       } catch {
@@ -722,7 +723,7 @@ export default function Permissions() {
                 )}
 
                 <div className="flex justify-end pt-1">
-                  <button type="submit" disabled={granting} className="btn gap-2 px-6">
+                  <button type="submit" disabled={granting} className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 px-6 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-800 active:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60">
                     {granting
                       ? <><Loader2 size={16} className="animate-spin" /> Granting…</>
                       : <><KeyRound size={16} /> Grant Access</>}

@@ -496,7 +496,6 @@ function NoteCard({ note, onView, patientName }) {
 function NoteModal({ note, patientName, onClose }) {
   const dr = note.doctor || {};
   const statusCfg = STATUS_CONFIG[note.status] || STATUS_CONFIG.reviewed;
-  const recent = isRecent(note.createdAt);
 
   // Close on ESC
   useEffect(() => {
@@ -585,11 +584,6 @@ function NoteModal({ note, patientName, onClose }) {
                 >
                   {statusCfg.label}
                 </span>
-                {recent && (
-                  <span className="ml-1.5 inline-flex items-center rounded-full border border-mint/30 bg-mint/10 px-2 py-0.5 text-[10px] font-semibold leading-none text-mint">
-                    Latest
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -703,7 +697,7 @@ function NoteModal({ note, patientName, onClose }) {
           </button>
           <button
             onClick={() => printNotePDF(note, patientName)}
-            className="btn gap-2 px-5 py-2"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-800 active:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Download size={14} /> Download PDF
           </button>

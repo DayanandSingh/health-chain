@@ -220,14 +220,6 @@ function ViewModal({ record, onClose, onDownload }) {
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
-          {/* Status badge */}
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={15} className="text-slate-400" />
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor}`}>
-              {record.status}
-            </span>
-          </div>
-
           {/* Detail grid */}
           <div className="grid gap-4 sm:grid-cols-2">
             {record.hospitalName && (
@@ -285,15 +277,6 @@ function ViewModal({ record, onClose, onDownload }) {
             </div>
           )}
 
-          {/* Blockchain hash */}
-          <div>
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Blockchain Hash
-            </p>
-            <p className="break-all rounded-lg bg-slate-50 p-3 font-mono text-xs text-slate-500">
-              {record.recordHash}
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -14,7 +14,11 @@ import api from "../../services/api";
 
 function fmtDate(iso) {
   if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
@@ -22,16 +26,23 @@ function Toast({ toast, onDismiss }) {
   if (!toast) return null;
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-[100]">
-      <div className={`pointer-events-auto flex max-w-sm items-center gap-3 rounded-xl border px-4 py-3 shadow-lg ${
-        toast.type === "success"
-          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-          : "border-red-200 bg-red-50 text-red-800"
-      }`}>
-        {toast.type === "success"
-          ? <CheckCircle2 size={17} className="shrink-0 text-emerald-600" />
-          : <AlertCircle  size={17} className="shrink-0 text-red-500"     />}
+      <div
+        className={`pointer-events-auto flex max-w-sm items-center gap-3 rounded-xl border px-4 py-3 shadow-lg ${
+          toast.type === "success"
+            ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+            : "border-red-200 bg-red-50 text-red-800"
+        }`}
+      >
+        {toast.type === "success" ? (
+          <CheckCircle2 size={17} className="shrink-0 text-emerald-600" />
+        ) : (
+          <AlertCircle size={17} className="shrink-0 text-red-500" />
+        )}
         <span className="text-sm font-medium">{toast.message}</span>
-        <button onClick={onDismiss} className="ml-1 shrink-0 opacity-50 hover:opacity-100">
+        <button
+          onClick={onDismiss}
+          className="ml-1 shrink-0 opacity-50 hover:opacity-100"
+        >
           <X size={14} />
         </button>
       </div>
@@ -53,10 +64,14 @@ function DeleteDialog({ onConfirm, onCancel }) {
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
           <Trash2 size={20} className="text-red-500" />
         </div>
-        <h3 className="text-lg font-bold text-slate-900">Delete Medical Note?</h3>
+        <h3 className="text-lg font-bold text-slate-900">
+          Delete Medical Note?
+        </h3>
         <p className="mt-2 text-sm text-slate-500">
           Are you sure you want to permanently delete this medical note?{" "}
-          <span className="font-medium text-slate-700">This action cannot be undone.</span>
+          <span className="font-medium text-slate-700">
+            This action cannot be undone.
+          </span>
         </p>
         <div className="mt-6 flex justify-end gap-3">
           <button onClick={onCancel} className="btn-secondary">
@@ -78,48 +93,62 @@ function DeleteDialog({ onConfirm, onCancel }) {
 function NoteModal({ note, patients, onSave, onClose }) {
   const isEdit = Boolean(note?._id);
   const [form, setForm] = useState({
-    patientName:      note?.patientName      || "",
-    patientId:        note?.patientId        || "",
-    diagnosis:        note?.diagnosis        || "",
-    symptoms:         note?.symptoms         || "",
-    prescription:     note?.prescription     || "",
+    patientName: note?.patientName || "",
+    patientId: note?.patientId || "",
+    diagnosis: note?.diagnosis || "",
+    symptoms: note?.symptoms || "",
+    prescription: note?.prescription || "",
     recommendedTests: note?.recommendedTests || "",
-    advice:           note?.advice           || "",
-    followUpDate:     note?.followUpDate
+    advice: note?.advice || "",
+    followUpDate: note?.followUpDate
       ? new Date(note.followUpDate).toISOString().slice(0, 10)
       : "",
   });
   const [saving, setSaving] = useState(false);
-  const [err,    setErr]    = useState("");
+  const [err, setErr] = useState("");
 
   useEffect(() => {
-    function onEsc(e) { if (e.key === "Escape") onClose(); }
+    function onEsc(e) {
+      if (e.key === "Escape") onClose();
+    }
     document.addEventListener("keydown", onEsc);
     return () => document.removeEventListener("keydown", onEsc);
   }, [onClose]);
 
-  function set(k, v) { setForm((f) => ({ ...f, [k]: v })); setErr(""); }
+  function set(k, v) {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErr("");
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.patientName.trim())  { setErr("Patient name is required."); return; }
-    if (!form.diagnosis.trim())    { setErr("Diagnosis is required."); return; }
-    if (!form.prescription.trim()) { setErr("Prescription / Medicines is required."); return; }
+    if (!form.patientName.trim()) {
+      setErr("Patient name is required.");
+      return;
+    }
+    if (!form.diagnosis.trim()) {
+      setErr("Diagnosis is required.");
+      return;
+    }
+    if (!form.prescription.trim()) {
+      setErr("Prescription / Medicines is required.");
+      return;
+    }
     setSaving(true);
     try {
       const data = {
-        patientName:      form.patientName.trim(),
-        patientId:        form.patientId.trim(),
-        diagnosis:        form.diagnosis.trim(),
-        symptoms:         form.symptoms.trim(),
-        prescription:     form.prescription.trim(),
+        patientName: form.patientName.trim(),
+        patientId: form.patientId.trim(),
+        diagnosis: form.diagnosis.trim(),
+        symptoms: form.symptoms.trim(),
+        prescription: form.prescription.trim(),
         recommendedTests: form.recommendedTests.trim(),
-        advice:           form.advice.trim(),
-        followUpDate:     form.followUpDate || null,
+        advice: form.advice.trim(),
+        followUpDate: form.followUpDate || null,
       };
       let res;
       if (isEdit) res = await api.put(`/doctor/notes/${note._id}`, data);
-      else        res = await api.post("/doctor/notes", data);
+      else res = await api.post("/doctor/notes", data);
       onSave(res.data.data, isEdit);
     } catch (e) {
       setErr(e.response?.data?.message || "Failed to save note.");
@@ -129,47 +158,61 @@ function NoteModal({ note, patients, onSave, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
       {/*
         flex + flex-col + max-h-[90vh] = modal is bounded to 90% of viewport height.
         The header and footer are shrink-0 (never compressed).
         The form body is flex-1 + overflow-y-auto (scrolls independently).
         min-h-0 on the form prevents flex children from overflowing their parent.
       */}
-      <div className="modal-light flex w-full max-w-lg flex-col rounded-2xl bg-white shadow-2xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-
+      <div
+        className="modal-light flex w-full max-w-lg flex-col rounded-2xl bg-white shadow-2xl max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* ── Fixed header ─────────────────────────────────────────────── */}
         <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-6 py-4">
-          <h3 className="font-bold text-slate-900">{isEdit ? "Edit Note" : "Add Medical Note"}</h3>
-          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200">
+          <h3 className="font-bold text-slate-900">
+            {isEdit ? "Edit Note" : "Add Medical Note"}
+          </h3>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
+          >
             <X size={15} />
           </button>
         </div>
 
         {/* ── Form: flex column so the scrollable body + fixed footer stack ── */}
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-
           {/* ── Scrollable fields area ────────────────────────────────── */}
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-
             {/* Patient selection */}
             {!isEdit && (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600">Patient Name *</label>
+                  <label className="mb-1 block text-xs font-medium text-slate-600">
+                    Patient Name *
+                  </label>
                   {patients.length > 0 ? (
                     <select
                       className="field"
                       value={form.patientName}
                       onChange={(e) => {
-                        const sel = patients.find((p) => p.name === e.target.value);
+                        const sel = patients.find(
+                          (p) => p.name === e.target.value,
+                        );
                         set("patientName", e.target.value);
                         set("patientId", sel?.patientId || "");
                       }}
                     >
                       <option value="">Select patient…</option>
                       {patients.map((p) => (
-                        <option key={p.patientId} value={p.name}>{p.name}</option>
+                        <option key={p.patientId} value={p.name}>
+                          {p.name}
+                        </option>
                       ))}
                       <option value="__other__">Other (type manually)</option>
                     </select>
@@ -183,7 +226,9 @@ function NoteModal({ note, patients, onSave, onClose }) {
                   )}
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600">Patient ID</label>
+                  <label className="mb-1 block text-xs font-medium text-slate-600">
+                    Patient ID
+                  </label>
                   <input
                     className="field"
                     placeholder="e.g. PAT-0001"
@@ -197,7 +242,9 @@ function NoteModal({ note, patients, onSave, onClose }) {
             {/* If "Other" selected in dropdown, show text input */}
             {!isEdit && form.patientName === "__other__" && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">Patient Name *</label>
+                <label className="mb-1 block text-xs font-medium text-slate-600">
+                  Patient Name *
+                </label>
                 <input
                   className="field"
                   placeholder="Enter patient name"
@@ -260,7 +307,9 @@ function NoteModal({ note, patients, onSave, onClose }) {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Lifestyle Advice</label>
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Lifestyle Advice
+              </label>
               <textarea
                 className="field resize-none"
                 rows={2}
@@ -271,7 +320,9 @@ function NoteModal({ note, patients, onSave, onClose }) {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Follow-up Date</label>
+              <label className="mb-1 block text-xs font-medium text-slate-600">
+                Follow-up Date
+              </label>
               <input
                 type="date"
                 className="field"
@@ -285,19 +336,23 @@ function NoteModal({ note, patients, onSave, onClose }) {
                 <AlertCircle size={14} /> {err}
               </p>
             )}
-
           </div>
           {/* ── end scrollable area ───────────────────────────────────── */}
 
           {/* ── Fixed footer — always visible, never overlaps fields ──── */}
           <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 px-6 py-4">
-            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-            <button type="submit" disabled={saving} className="btn gap-2">
-              {saving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-800 active:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60">
+              {saving ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <CheckCircle2 size={14} />
+              )}
               {isEdit ? "Save Changes" : "Add Note"}
             </button>
           </div>
-
         </form>
       </div>
     </div>
@@ -306,15 +361,15 @@ function NoteModal({ note, patients, onSave, onClose }) {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function DoctorNotes() {
-  const [notes,    setNotes]    = useState([]);
+  const [notes, setNotes] = useState([]);
   const [patients, setPatients] = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState(false);
-  const [modal,    setModal]    = useState(null); // null | "add" | noteObj (edit)
-  const [delNote,  setDelNote]  = useState(null);
-  const [toast,    setToast]    = useState(null);
-  const [search,   setSearch]   = useState("");
-  const [filter,   setFilter]   = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [modal, setModal] = useState(null); // null | "add" | noteObj (edit)
+  const [delNote, setDelNote] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
   function showToast(msg, type = "success") {
     setToast({ message: msg, type });
@@ -324,20 +379,24 @@ export default function DoctorNotes() {
   const fetchNotes = useCallback(() => {
     setLoading(true);
     setError(false);
-    api.get("/doctor/notes")
+    api
+      .get("/doctor/notes")
       .then((res) => setNotes(res.data.data || []))
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { fetchNotes(); }, [fetchNotes]);
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
   // Load patient list for the add-note dropdown
   useEffect(() => {
-    api.get("/doctor/patients")
+    api
+      .get("/doctor/patients")
       .then((res) => {
         const pats = (res.data.data || []).map((p) => ({
-          name:      p.patient?.name || p.patient?.user?.fullName || "Unknown",
+          name: p.patient?.name || p.patient?.user?.fullName || "Unknown",
           patientId: p.patient?.patientId || "",
         }));
         setPatients(pats);
@@ -382,10 +441,11 @@ export default function DoctorNotes() {
     // Text search across patient name, patient ID, diagnosis
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      result = result.filter((n) =>
-        (n.patientName || "").toLowerCase().includes(q) ||
-        (n.patientId   || "").toLowerCase().includes(q) ||
-        (n.diagnosis   || "").toLowerCase().includes(q)
+      result = result.filter(
+        (n) =>
+          (n.patientName || "").toLowerCase().includes(q) ||
+          (n.patientId || "").toLowerCase().includes(q) ||
+          (n.diagnosis || "").toLowerCase().includes(q),
       );
     }
 
@@ -414,11 +474,14 @@ export default function DoctorNotes() {
   return (
     <>
       <section className="space-y-6">
-
         {/* ── Page heading ───────────────────────────────────────────────── */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Medical Notes</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">Your private clinical notes for patients.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Medical Notes
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">
+            Your private clinical notes for patients.
+          </p>
         </div>
 
         {/* ── Toolbar: Search + Filter + Add Note ────────────────────────── */}
@@ -453,7 +516,10 @@ export default function DoctorNotes() {
           </select>
 
           {/* Add Note */}
-          <button onClick={() => setModal("add")} className="btn shrink-0 gap-2">
+          <button
+            onClick={() => setModal("add")}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-800 active:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60"
+          >
             <Plus size={16} /> Add Note
           </button>
         </div>
@@ -476,7 +542,10 @@ export default function DoctorNotes() {
         {loading && (
           <div className="space-y-3">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-card">
+              <div
+                key={i}
+                className="rounded-2xl border border-slate-100 bg-white p-5 shadow-card"
+              >
                 <div className="mb-3 h-5 w-1/4 animate-pulse rounded bg-slate-100" />
                 <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
                 <div className="mt-2 h-4 w-1/2 animate-pulse rounded bg-slate-100" />
@@ -493,31 +562,39 @@ export default function DoctorNotes() {
             </div>
             <div className="text-center">
               <p className="font-semibold text-slate-700">No notes yet.</p>
-              <p className="mt-1 text-sm text-slate-400">Add your first clinical note for a patient.</p>
+              <p className="mt-1 text-sm text-slate-400">
+                Add your first clinical note for a patient.
+              </p>
             </div>
-            <button onClick={() => setModal("add")} className="btn mt-2 gap-2">
+            <button onClick={() => setModal("add")} className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 mt-2 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-800 active:bg-blue-900">
               <Plus size={14} /> Add Note
             </button>
           </div>
         )}
 
         {/* ── Empty state: search / filter returned no results ──────────── */}
-        {!loading && !error && notes.length > 0 && filteredNotes.length === 0 && (
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white py-16 shadow-card">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50">
-              <Search size={28} className="text-slate-300" />
+        {!loading &&
+          !error &&
+          notes.length > 0 &&
+          filteredNotes.length === 0 && (
+            <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-white py-16 shadow-card">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50">
+                <Search size={28} className="text-slate-300" />
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-slate-700">
+                  No medical notes found.
+                </p>
+                <p className="mt-1 text-sm text-slate-400">
+                  Try adjusting your search or filter, or clear them to see all
+                  notes.
+                </p>
+              </div>
+              <button onClick={clearFilters} className="btn-secondary mt-2">
+                Clear Filters
+              </button>
             </div>
-            <div className="text-center">
-              <p className="font-semibold text-slate-700">No medical notes found.</p>
-              <p className="mt-1 text-sm text-slate-400">
-                Try adjusting your search or filter, or clear them to see all notes.
-              </p>
-            </div>
-            <button onClick={clearFilters} className="btn-secondary mt-2">
-              Clear Filters
-            </button>
-          </div>
-        )}
+          )}
 
         {/* ── Notes grid ───────────────────────────────────────────────── */}
         {!loading && !error && filteredNotes.length > 0 && (
@@ -530,12 +607,16 @@ export default function DoctorNotes() {
                 {/* Patient info */}
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-semibold text-slate-900">{n.patientName}</p>
+                    <p className="font-semibold text-slate-900">
+                      {n.patientName}
+                    </p>
                     {n.patientId && (
                       <p className="text-xs text-slate-500">{n.patientId}</p>
                     )}
                   </div>
-                  <span className="shrink-0 text-xs text-slate-400">{fmtDate(n.createdAt)}</span>
+                  <span className="shrink-0 text-xs text-slate-400">
+                    {fmtDate(n.createdAt)}
+                  </span>
                 </div>
 
                 <div className="h-px bg-slate-100" />
@@ -544,20 +625,32 @@ export default function DoctorNotes() {
                 <div className="space-y-2 text-sm">
                   {n.diagnosis && (
                     <div>
-                      <p className="text-xs font-medium text-slate-400">Diagnosis</p>
-                      <p className="mt-0.5 line-clamp-2 text-slate-700">{n.diagnosis}</p>
+                      <p className="text-xs font-medium text-slate-400">
+                        Diagnosis
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-slate-700">
+                        {n.diagnosis}
+                      </p>
                     </div>
                   )}
                   {n.prescription && (
                     <div>
-                      <p className="text-xs font-medium text-slate-400">Prescription</p>
-                      <p className="mt-0.5 line-clamp-2 text-slate-700">{n.prescription}</p>
+                      <p className="text-xs font-medium text-slate-400">
+                        Prescription
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-slate-700">
+                        {n.prescription}
+                      </p>
                     </div>
                   )}
                   {n.advice && (
                     <div>
-                      <p className="text-xs font-medium text-slate-400">Advice</p>
-                      <p className="mt-0.5 line-clamp-2 text-slate-700">{n.advice}</p>
+                      <p className="text-xs font-medium text-slate-400">
+                        Advice
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-slate-700">
+                        {n.advice}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -581,7 +674,6 @@ export default function DoctorNotes() {
             ))}
           </div>
         )}
-
       </section>
 
       {/* ── Modals ──────────────────────────────────────────────────────────── */}

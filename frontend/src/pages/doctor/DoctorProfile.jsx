@@ -620,7 +620,7 @@ export default function DoctorProfile() {
 
                     <div className="flex items-center justify-end gap-3 pt-1">
                       <button type="button" onClick={cancelEdit} disabled={saving} className="btn-secondary px-5 py-2">Cancel</button>
-                      <button type="submit" disabled={saving} className="btn gap-2 px-5 py-2">
+                      <button type="submit" disabled={saving} className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 px-5 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-800 active:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-60">
                         {saving ? <><Loader2 size={15} className="animate-spin" /> Saving…</> : "Save Changes"}
                       </button>
                     </div>
